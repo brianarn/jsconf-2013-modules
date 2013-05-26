@@ -1,0 +1,23 @@
+/* Additional styles for my presentation yay */
+.reveal footer {
+	position: fixed;
+	bottom: 2px;
+	right: 10px;
+}
+.reveal li {
+	margin-bottom: 1em;
+}
+.reveal p {
+	line-height: 1.4em;
+	margin-bottom: 1em;
+}
+.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+	margin-bottom: 0.5em;
+}
+.reveal .controls {
+	bottom: 20px;
+}
+.reveal footer p {
+	line-height: 0.3em;
+	font-size: 25%;
+}
