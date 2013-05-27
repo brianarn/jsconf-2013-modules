@@ -232,7 +232,7 @@ function decrement() {
 					<p class="fragment">So, if those aren't global... how do we get stuff out?</p>
 				</section>
 				<section>
-					<h3>Exports</h3>
+					<h3><code>exports</code></h3>
 					<p>The <code>exports</code> variable is simply an object that is the implicit value of your module.</p>
 					<p>When your module is requested, the code is executed and then <code>exports</code> is returned for you.</p>
 				</section>
@@ -254,7 +254,7 @@ exports.decrement = function() {
 					<p class="fragment">... but what if I want my module's value to be a function?</p>
 				</section>
 				<section>
-					<h3>Module</h3>
+					<h3><code>module</code></h3>
 					<p>The <code>module</code> variable is an object with a couple of unique properties:
 					<ul>
 						<li><code>module.id</code>: The identifier assigned to your module by the module loader</li>
@@ -283,7 +283,7 @@ module.exports = Greeter;
 					</code></pre>
 				</section>
 				<section>
-					<h3>require</h3>
+					<h3><code>require</code></h3>
 					<p>The <code>require</code> variable is a function that you invoke with a module ID, and it returns that module's value to you.</p>
 				</section>
 				<section>
@@ -350,10 +350,148 @@ server.listen(4000);
 					<p>Also based upon a <a href="https://github.com/amdjs/amdjs-api/wiki/AMD">specification</a>, AMD loaders provide a slightly different API.</p>
 					<p>Two methods: <code>require</code> and <code>define</code>.</p>
 				</section>
+				<section>
+					<h3><code>require</code></h3>
+					<p>Unlike CommonJS, <code>require</code> in AMD takes in two arguments:</p>
+					<ul>
+						<li>An array of module IDs to load</li>
+						<li>A callback to be executed once those modules are available</li>
+					</ul>
+					<p>The modules loaded by ID are passed into the callback in their relative positions.</p>
+				</section>
+				<section>
+					<p>Let's take a look:</p>
+					<pre><code data-trim class="javascript">
+// A simple example using Dojo
+require(['dijit/form/Button'], function(Button){
+	var button = new Button({
+		label: 'Click Me!'
+	});
+	button.on('click', function(event){
+		// Do something
+	});
+});
+					</code></pre>
+				</section>
+				<section>
+					<h3><code>define</code></h3>
+					<p>The <code>define</code> method is very similar to <code>require</code>. It takes two arguments:</p>
+					<ul>
+						<li>An optional array of module IDs, which serve as this module's dependencies</li>
+						<li>A callback function (often referred to as a factory function) which will be invoked when dependencies are loaded, OR a value to use directory as the module's value.</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Simple AMD object-as-module</h3>
+					<pre><code data-trim class="javascript">
+// app/config.js
+define({
+	default: 'home',
+	options: { /*...*/ },
+	async: true
+});
+					</code></pre>
+				</section>
+				<section>
+					<h3>Simple AMD factory</h3>
+					<pre><code data-trim class="javascript">
+define(function(){
+	var count = 0;
+	var counter = {};
+
+	// Similar to exports from this example in CommonJS
+	counter.increment = function() { return ++count; }
+	counter.decrement = function() {
+		if (count === 0) { throw new Error("Can't go negative!"); }
+		return --count;
+	}
+
+	// Don't forget the return!
+	return counter;
+});
+					</code></pre>
+				</section>
+				<section>
+					<h3>CommonJS meets AMD</h3>
+					<p><code>require</code>, <code>module</code>, and <code>exports</code> are all reserved module IDs, which produce similar effects to CommonJS style, but in AMD:</p>
+					<pre><code data-trim class="javascript">
+define(["exports"], function(exports){
+	var count = 0;
+
+	exports.increment = function() { return ++count; }
+	exports.decrement = function() {
+		if (count === 0) { throw new Error("Can't go negative!"); }
+		return --count;
+	}
+});
+					</code></pre>
+				</section>
+				<section>
+					<h3>Distinctions from CommonJS</h3>
+					<p>In AMD, we're listing dependencies all up front, and then receiving them as arguments to our callback.</p>
+					<p>All code is loaded asynchronously (usually script tag injection).</p>
+					<p>Most AMD loaders implement the concept of <a href="https://github.com/amdjs/amdjs-api/wiki/Loader-Plugins">loader plugins</a>.</p>
+				</section>
+				<section>
+					<h3>AMD Loader Plugins</h3>
+					<p>If the loader encounters a module ID with an exclamation point in it, generally two things happen:</p>
+					<ol>
+						<li>The module ID from the left side of the string is loaded</li>
+						<li>Once loaded, the module receives the right side of the string and does something meaningful</li>
+					</ol>
+				</section>
+				<section>
+					<h3>Waiting for DOM readiness via plugin</h3>
+					<p>Using RequireJS:</p>
+					<pre><code data-trim class="javascript">
+require(['domReady!'], function(){
+	console.log('The DOM is ready!');
+});
+					</code></pre>
+					<p>In this case, we don't care about the module's value, so much as the side effect of waiting for the DOM to be ready</p>
+				</section>
+				<section>
+					<h3>Loading arbitrary text</h3>
+					<p>A simple widget from Dojo:</p>
+					<pre><code data-trim class="javascript">
+define([
+	'dojo/_base/declare',
+	'dijit/_WidgetBase',
+	'dijit/_TemplatedMixin',
+	'dojo/text!./templates/MyWidget.html'
+], function(declare, _WidgetBase, _TemplatedMixin, template){
+	// By this point, `template` is the HTML content as a string
+	return declare([_WidgetBase, _TemplatedMixin], {
+		templateString: template
+	});
+});
+					</code></pre>
+				</section>
+				<section>
+					<h3>AMD pros:</h3>
+					<p>Very simple API</p>
+					<p>Wide variety of loaders available</p>
+					<p>Plugins offer an immense amount of flexibility</p>
+				</section>
 			</section>
 			<section>
 				<section>
 					<h2>Best of Both: UMD</h2>
+				</section>
+				<section>
+					<h3>AMD-wrapped CommonJS</h3>
+					<p>If you don't specify dependencies, most AMD loaders will provide <code>require</code>, <code>exports</code>, and <code>module</code> implicitly, meaning you can basically write two-in-one:</p>
+					<pre><code data-trim class="javascript">
+define(["exports"], function(exports){
+	var count = 0;
+
+	exports.increment = function() { return ++count; }
+	exports.decrement = function() {
+		if (count === 0) { throw new Error("Can't go negative!"); }
+		return --count;
+	}
+});
+					</code></pre>
 				</section>
 			</section>
 			<section>
@@ -370,6 +508,8 @@ server.listen(4000);
 				<section>
 					<h2>Resources</h2>
 					<ul>
+						<li><a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS Module spec</a></li>
+						<li><a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD spec</a></li>
 						<li><a href="http://know.cujojs.com/tutorials/modules/">Learning Modules</a> on <a href="http://know.cujojs.com">know.cujojs.com</a>
 						<li><a href="http://alistapart.com/article/writing-testable-javascript">Writing Testable JavaScript</a> by Rebecca Murphey, in A List Apart issue 375
 					</ul>

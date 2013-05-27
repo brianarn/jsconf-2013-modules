@@ -1,4 +1,10 @@
 /* Additional styles for my presentation yay */
+.reveal {
+	tab-size: 4;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	-webkit-tab-size: 4;
+}
 .reveal footer {
 	position: fixed;
 	bottom: 2px;
