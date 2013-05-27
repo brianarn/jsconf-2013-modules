@@ -208,10 +208,147 @@ var myModule = (function(){
 				<section>
 					<h2>Modern Modules: CommonJS</h2>
 				</section>
+				<section>
+					<h3>CommonJS Modules</h3>
+					<p>The CommonJS module format has a <a href="http://wiki.commonjs.org/wiki/Modules/1.1">specification</a> that defines a few things:</p>
+					<ul>
+						<li>Context of execution</li>
+						<li>Free variables: <code>require</code>, <code>module</code>, and <code>exports</code>
+					</ul>
+				</section>
+				<section>
+					<h3>Context</h3>
+					<p>Each module executes its code in its own scope, free of the global scope.</p>
+					<pre><code data-trim class="javascript">
+// These look like they'd be global, but they aren't!
+// No need for an IIFE!
+var count = 0;
+function increment() { return ++count; }
+function decrement() {
+	if (count === 0) { throw new Error("Can't go negative!"); }
+	return --count;
+}
+					</code></pre>
+					<p class="fragment">So, if those aren't global... how do we get stuff out?</p>
+				</section>
+				<section>
+					<h3>Exports</h3>
+					<p>The <code>exports</code> variable is simply an object that is the implicit value of your module.</p>
+					<p>When your module is requested, the code is executed and then <code>exports</code> is returned for you.</p>
+				</section>
+				<section>
+					<p>Let's take a look:</p>
+					<pre><code data-trim class="javascript">
+// Similar setup to earlier
+var count = 0;
+
+// We're now creating our functions as properties of `exports`
+exports.increment = function() { return ++count; }
+exports.decrement = function() {
+	if (count === 0) { throw new Error("Can't go negative!"); }
+	return --count;
+}
+
+// No need to return or anything
+					</code></pre>
+					<p class="fragment">... but what if I want my module's value to be a function?</p>
+				</section>
+				<section>
+					<h3>Module</h3>
+					<p>The <code>module</code> variable is an object with a couple of unique properties:
+					<ul>
+						<li><code>module.id</code>: The identifier assigned to your module by the module loader</li>
+						<li><code>module.exports</code>: Initially the <code>exports</code> object, but it allows you to overwrite the module's exported value directly</li>
+					</ul>
+				</section>
+				<section>
+					<p>Let's take a look:</p>
+					<pre><code data-trim class="javascript">
+// Let's create a constructor function
+function Greeter(name, store){
+	this.name = name || 'Bob';
+	this.store = store || 'Awesome Widgets';
+}
+Greeter.prototype = {
+	greet: function(person) {
+		var greeting = 'Welcome to ' + this.store + '!';
+		greeting += ' I am ' + this.name + '.';
+
+		// Get all up in their face
+		alert(greeting);
+	}
+};
+// Set our module's value to this constructor
+module.exports = Greeter;
+					</code></pre>
+				</section>
+				<section>
+					<h3>require</h3>
+					<p>The <code>require</code> variable is a function that you invoke with a module ID, and it returns that module's value to you.</p>
+				</section>
+				<section>
+					<h3>Module ID?</h3>
+					<p>A module ID is a string that typically looks like a file path, just without the <code>.js</code> at the end.</p>
+					<p>Typically the loader is configured in a way to know where to start looking for files.</p>
+					<p>Often people refer to <em>packages</em> of modules, which are usually just a folder containing several modules.</p>
+				</section>
+				<section>
+					<h3>Module ID examples</h3>
+					<ul>
+						<li><code>jquery</code></li>
+						<li><code>dojo/router</code></li>
+						<li><code>app/views/Widget</code></li>
+					</ul>
+				</section>
+				<section>
+					<p>Let's take a look:</p>
+					<pre><code data-trim class="javascript">
+// This code would actually work in Node:
+// Load the http module using `require`
+var http = require('http');
+
+// Create a server
+var server = http.createServer(function (request, response) {
+	response.writeHead(200, {'Content-Type': 'text/plain'});
+	response.end('Hello JSConf!\n');
+});
+
+// Listen on the specified port
+server.listen(4000);
+					</code></pre>
+				</section>
+				<section>
+					<h3>That's it!</h3>
+					<p>Seriously.</p>
+				</section>
+				<section>
+					<h3>CommonJS pros:</h3>
+					<p>Very simple API.</p>
+					<p>Feels very clean, easy to write.</p>
+				</section>
+				<section>
+					<h3>CommonJS cons:</h3>
+					<p>Not built for browsers: browsers don't provide the free varibles out of the box, nor do they make it easy to run in a clean scope for each module.</p>
+					<p>The <code>require</code> method is synchronous, but module values may not be fully complete during execution - module values are <a href="https://github.com/cujojs/curl/wiki/Using-curl.js-with-CommonJS-Modules#commonjs-gotchas">exported early</a>.</p>
+					<p>Loading JS is fine, but other assets (HTML for templating, CSS, etc) can't be done via this API.</p>
+				</section>
+				<section>
+					<h3>Browser-based CommonJS</h3>
+					<p>There are some options for browser-based CommonJS:</p>
+					<ul>
+						<li><a href="https://github.com/cujojs/curl">curl</a> is a great resource loader that can load CommonJS modules directly.</li>
+						<li><a href="http://browserify.org/">Browserify</a> can build node.js-style modules (effectively CommonJS + some extra stuff) into code for browser delivery.</li>
+					</ul>
+				</section>
 			</section>
 			<section>
 				<section>
 					<h2>Modern Modules: AMD</h2>
+				</section>
+				<section>
+					<h2>AMD modules</h2>
+					<p>Also based upon a <a href="https://github.com/amdjs/amdjs-api/wiki/AMD">specification</a>, AMD loaders provide a slightly different API.</p>
+					<p>Two methods: <code>require</code> and <code>define</code>.</p>
 				</section>
 			</section>
 			<section>
