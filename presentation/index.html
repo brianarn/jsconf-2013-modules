@@ -117,7 +117,7 @@
 				</section>
 				<section>
 					<h3>Easier builds</h3>
-					<p>Rather than having to set up lists of files to manually concatenate and minify, most module systems typically have a build process that can lean on the dependency management to create your production deployment, getting all the concat/minify benefits with no real effort.</p>
+					<p>Rather than having to set up lists of files to manually concatenate and minify, most module systems typically have a build process that can lean on the dependency management to create your production deployment, getting all the concat/minify benefits with minimal effort.</p>
 				</section>
 			</section>
 			<section>
@@ -281,6 +281,10 @@ Greeter.prototype = {
 // Set our module's value to this constructor
 module.exports = Greeter;
 					</code></pre>
+				</section>
+				<section>
+					<p>One small note about <code>module.exports</code>:</p>
+					<p>Technically not in spec, but implemented in most environments. Read the docs for whatever you're using.</p>
 				</section>
 				<section>
 					<h3><code>require</code></h3>
@@ -448,7 +452,7 @@ require(['domReady!'], function(){
 	console.log('The DOM is ready!');
 });
 					</code></pre>
-					<p>In this case, we don't care about the module's value, so much as the side effect of waiting for the DOM to be ready</p>
+					<p>In this case, we don't care about the module's value, so much as the side effect of waiting for the DOM to be ready.</p>
 				</section>
 				<section>
 					<h3>Loading arbitrary text</h3>
@@ -468,15 +472,78 @@ define([
 					</code></pre>
 				</section>
 				<section>
+					<h3>Plugins offer extensibility</h3>
+					<p>A wide variety of plugins exist for loading all sorts of different types of resources:</p>
+					<ul>
+						<li>Non-AMD JS files</li>
+						<li>CSS</li>
+						<li>i18n bundles</li>
+					</ul>
+					<p>Check the docs for your loader of choice to see what plugins may be available!</p>
+				</section>
+				<section>
+					<h3>Loader Plugins: Draft</h3>
+					<p>Loader Plugins are still in a draft state. Different loaders support different plugins. Read the docs of your loader of choice for details.</p>
+				</section>
+				<section>
 					<h3>AMD pros:</h3>
 					<p>Very simple API</p>
 					<p>Wide variety of loaders available</p>
 					<p>Plugins offer an immense amount of flexibility</p>
 				</section>
+				<section>
+					<h3>AMD cons:</h3>
+					<p>The dependency array can get rather large for complex modules.</p>
+					<p>Easy to get a mismatch between dependency array and callback arguments.</p>
+				</section>
+				<section>
+					<p>What's wrong here?</p>
+					<pre><code data-trim class="javascript">
+define([
+	'dojo/_base/array',
+	'dojo/_base/lang',
+	'dojo/_base/declare',
+	'dojo/Deferred',
+	'dijit/_WidgetBase',
+	'dijit/_TemplatedMixin',
+	'dojo/text!./templates/MyWidget.html',
+	'dojo/i18n!./nls/common'
+], function(arrayUtil, lang, Deferred, declare, _WidgetBase,
+            _TemplatedMixin, template, i18nBundle){
+});
+					</code></pre>
+					<p class="fragment">The arguments for <code>declare</code> and <code>Deferred</code> are swapped!</p>
+				</section>
+				<section>
+					<p>What's wrong here?</p>
+					<pre><code data-trim class="javascript">
+define([
+	'dojo/_base/array',
+	'dojo/_base/lang',
+	'dojo/_base/declare',
+	'dojo/Deferred',
+	'dojo/request',
+	'dijit/_WidgetBase',
+	'dijit/_TemplatedMixin',
+	'dojo/text!./templates/MyWidget.html',
+	'dojo/i18n!./nls/common'
+], function(arrayUtil, lang, declare, Deferred, _WidgetBase,
+            _TemplatedMixin, template, i18nBundle){
+});
+					</code></pre>
+					<p class="fragment">The <code>dojo/request</code> module exists in the dependencies, but not in the arguments!</p>
+				</section>
+				<section>
+					<h3>Can we do better?</h3>
+					<h4>Maybe.</h4>
+				</section>
 			</section>
 			<section>
 				<section>
 					<h2>Best of Both: UMD</h2>
+				</section>
+				<section>
+					<h3>What is UMD?</h3>
 				</section>
 				<section>
 					<h3>AMD-wrapped CommonJS</h3>
