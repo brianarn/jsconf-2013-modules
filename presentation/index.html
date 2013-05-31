@@ -35,9 +35,11 @@
 				<p>
 					<a href="http://twitter.com/brianarn">@brianarn</a> | <a href="http://www.randomthink.net">randomthink.net</a>
 				</p>
-				<p>
-					Lead Support &amp; Senior Software Engineer @ <a href="http://www.sitepen.com">SitePen</a>
-				</p>
+				<ul>
+					<li>Lead Support &amp; Senior Software Engineer @ <a href="http://www.sitepen.com">SitePen</a></li>
+					<li><a href="http://dojotoolkit.org">Dojo</a> core committer</li>
+					<li>Rock Band guitar expert</li>
+				</ul>
 			</section>
 			<section>
 				<h2>Outline</h2>
@@ -98,7 +100,7 @@
 					<p>Focused code = focused developer.</p>
 				</section>
 				<section>
-					<h3>Easier maintenance</h3>
+					<h3>Easier Maintenance</h3>
 					<p>Coming back to a project months/years later, dealing with several small, focused files is much, much easier.</p>
 					<blockquote>
 						<p>You don't write code for yourself, you write it for the moron who has to maintain it in a year.</p>
@@ -106,21 +108,39 @@
 					</blockquote>
 				</section>
 				<section>
-					<h3>Dependency management</h3>
+					<h3>Dependency Management</h3>
 					<p>JS has no explicit means of specifying dependencies or sequence of loading (yet) outside of simply listing tags in order.</p>
 					<p>Module loaders make it simple to specify dependencies and not have to care about sequence of loading files.</p>
+				</section>
+				<section>
+					<h3>Dependency Management</h3>
+					<p>An example of the power of dependency management: The HTML for a large-scale application</p>
+					<pre><code data-trim class="html">
+&lt;!DOCTYPE html>
+&lt;html>
+	&lt;head>
+		&lt;meta charset="UTF-8">
+		&lt;title>My Amazing App&lt;/title>
+	&lt;/head>
+	&lt;body>
+		&lt;script src="path/to/dojo.js"
+				data-dojo-config="deps: ['app'], async: true">&lt;/script>
+	&lt;/body>
+&lt;/html>
+					</code></pre>
 				</section>
 				<section>
 					<h3>Simplified testing</h3>
 					<p>Modules of code can be easily loaded and tested as individual units of code.</p>
 					<p>There are some great test frameworks out there (such as <a href="http://theintern.io/">Intern</a>) that make testing modular JS very simple.
+					<p>Read more on testing in <a href="http://alistapart.com/article/writing-testable-javascript">Writing Testable JavaScript</a> by Rebecca Murphey, in A List Apart issue 375.</p>
 				</section>
 				<section>
 					<h3>Easier builds</h3>
 					<p>Rather than having to set up lists of files to manually concatenate and minify, most module systems typically have a build process that can lean on the dependency management to create your production deployment, getting all the concat/minify benefits with minimal effort.</p>
 				</section>
 			</section>
-			<section>
+			<section class="nocaps">
 				<section>
 					<h2>The Module Pattern</h2>
 				</section>
@@ -204,7 +224,7 @@ var myModule = (function(){
 					</ul>
 				</section>
 			</section>
-			<section>
+			<section class="lower">
 				<section>
 					<h2>Modern Modules: CommonJS</h2>
 				</section>
@@ -332,7 +352,7 @@ server.listen(4000);
 				</section>
 				<section>
 					<h3>CommonJS cons:</h3>
-					<p>Not built for browsers: browsers don't provide the free varibles out of the box, nor do they make it easy to run in a clean scope for each module.</p>
+					<p>Modules are difficult to load in browser: Loaders have to do more work.</p>
 					<p>The <code>require</code> method is synchronous, but module values may not be fully complete during execution - module values are <a href="https://github.com/cujojs/curl/wiki/Using-curl.js-with-CommonJS-Modules#commonjs-gotchas">exported early</a>.</p>
 					<p>Loading JS is fine, but other assets (HTML for templating, CSS, etc) can't be done via this API.</p>
 				</section>
@@ -345,7 +365,7 @@ server.listen(4000);
 					</ul>
 				</section>
 			</section>
-			<section>
+			<section class="lower">
 				<section>
 					<h2>Modern Modules: AMD</h2>
 				</section>
@@ -535,21 +555,27 @@ define([
 				</section>
 				<section>
 					<h3>Can we do better?</h3>
-					<h4>Maybe.</h4>
+					<h4>... Maybe, depends on your need.</h4>
 				</section>
 			</section>
-			<section>
+			<section clas="lower">
 				<section>
 					<h2>Best of Both: UMD</h2>
+					<h3>Universal Module Definition</h3>
 				</section>
 				<section>
 					<h3>What is UMD?</h3>
+					<p>It's basically a series of patterns to support multiple modules formats at once.</p>
+					<p>There is no spec, but there is a repo with common patterns:</p>
+					<p>
+						<a href="https://github.com/umdjs/umd">https://github.com/umdjs/umd</a>
+					</p>
 				</section>
 				<section>
 					<h3>AMD-wrapped CommonJS</h3>
 					<p>If you don't specify dependencies, most AMD loaders will provide <code>require</code>, <code>exports</code>, and <code>module</code> implicitly, meaning you can basically write two-in-one:</p>
 					<pre><code data-trim class="javascript">
-define(["exports"], function(exports){
+define(function(require, exports, module){
 	var count = 0;
 
 	exports.increment = function() { return ++count; }
@@ -557,13 +583,63 @@ define(["exports"], function(exports){
 		if (count === 0) { throw new Error("Can't go negative!"); }
 		return --count;
 	}
+
+	var widget = require('./widget');
+	exports.getValue = function(){ return widget.value; }
+	exports.setValue =
+		function(value){ /* Validate, then */ widget.value = value; }
 });
 					</code></pre>
 				</section>
+				<section>
+					<h3>When do I care about UMD?</h3>
+					<ul>
+						<li>When you want to load modules in a variety of environments</li>
+						<li>When you're distributing your code</li>
+					</ul>
+					<p>For most app development, it's easier to just pick a single module format and use it.</p>
+				</section>
 			</section>
-			<section>
+			<section class="lower">
 				<section>
 					<h2>The Future: ES6 Modules</h2>
+				</section>
+				<section>
+					<h2>WARNING</h2>
+					<p>This spec is still in debate and discussion</p>
+					<p>Not ready for prime time yet, though <a href="http://squareup.com">Square</a> has a neat <a href="http://corner.squareup.com/2013/02/es6-module-transpiler.html">transpiler from ES6 to AMD or CJS</a>.</p>
+				</section>
+				<section>
+					<h3>Module format</h3>
+					<p>New keyword: <code>export</code></p>
+					<pre><code data-trim class="javascript">
+// Clean scope, no need for IIFE
+var count = 0;
+
+// Can easily export methods
+export function increment() { return ++count; }
+export function decrement() {
+	if (count === 0) { throw new Error("Can't go negative!"); }
+	return --count;
+}
+
+// Exporting values is fine too
+var answerToAll = 42;
+export answerToAll;
+					</code></pre>
+				</section>
+				<section>
+					<h3>Loading modules</h3>
+					<pre><code data-trim class="javascript">
+// Can load the whole thing
+import "counter" as counter;
+
+var next = counter.increment();
+
+// Can load just individual pieces
+import { increment } from "counter";
+next = increment();
+					</code></pre>
 				</section>
 			</section>
 			<section>
@@ -575,10 +651,11 @@ define(["exports"], function(exports){
 				<section>
 					<h2>Resources</h2>
 					<ul>
+						<li><a href="https://gist.github.com/desandro/4686136">Gist on "Why modules"</a></li>
 						<li><a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS Module spec</a></li>
 						<li><a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD spec</a></li>
+						<li><a href="https://gist.github.com/wycats/51c96e3adcdb3a68cbc3">ES6 Modules summary</a> by Yehuda Katz</li>
 						<li><a href="http://know.cujojs.com/tutorials/modules/">Learning Modules</a> on <a href="http://know.cujojs.com">know.cujojs.com</a>
-						<li><a href="http://alistapart.com/article/writing-testable-javascript">Writing Testable JavaScript</a> by Rebecca Murphey, in A List Apart issue 375
 					</ul>
 				</section>
 			</section>

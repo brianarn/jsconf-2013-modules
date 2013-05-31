@@ -20,6 +20,9 @@
 .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
 	margin-bottom: 0.5em;
 }
+.reveal .lower h1, .reveal .lower h2, .reveal .lower h3, .reveal .lower h4, .reveal .lower h5, .reveal .lower h6 {
+	text-transform: none;
+}
 .reveal .controls {
 	bottom: 20px;
 }
