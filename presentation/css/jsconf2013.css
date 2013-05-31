@@ -1,4 +1,14 @@
 /* Additional styles for my presentation yay */
+#logo {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	z-index: 9999;
+}
+
+#logo img {
+	max-height: 4%;
+}
 .reveal {
 	tab-size: 4;
 	-moz-tab-size: 4;
